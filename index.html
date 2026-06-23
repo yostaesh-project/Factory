@@ -9,28 +9,34 @@
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<style>body{margin:0}#root{min-height:100vh}#ld{color:#1FC8C2;padding:40px;text-align:center;font-family:Arial;font-size:18px}</style>
+<style>body{margin:0}#root{min-height:100vh}#ld{color:#1FC8C2;padding:30px;text-align:center;font-family:Arial;font-size:18px}</style>
 </head>
 <body>
-<div id="root"><div id="ld">טוען... (עד 30 שניות)</div></div>
+<div id="root"><div id="ld">טוען...</div></div>
 <script>
 const {useState,useEffect,useRef,useMemo}=React;
 function _no(){return null;}
 ['LayoutGrid','Package','ClipboardList','Plus','Search','AlertTriangle','Download','Send','Trash2','X','Globe','LogOut','Edit2','ArrowRightLeft','Undo2','MessageSquare','Paperclip','ChevronLeft','RefreshCw','Check','Factory','Wrench','Loader2','Layers','ListChecks','Award','SlidersHorizontal','UserCircle','Link2','ShieldCheck','Bell','Warehouse','Image'].forEach(function(n){window[n]=(lucide&&lucide[n])||_no;});
 window.ImageIcon=window.Image||_no;
 window.onerror=function(m,s,l){document.getElementById('ld').innerHTML='שגיאה שורה '+l+':<br>'+m;};
-setTimeout(function(){
-  fetch('app.js').then(function(r){return r.text();}).then(function(code){
-    document.getElementById('ld').textContent='מתרגם... (עוד כמה שניות)';
-    code=code.replace(/^import[\s\S]*?from\s['"][^'"]+['"];?\n/gm,'');
-    code=code.replace(/^export\s+default\s+/gm,'');
-    code+='\nReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));';
-    setTimeout(function(){
-      try{var c=Babel.transform(code,{presets:['react']}).code;(0,eval)(c);}
-      catch(e){document.getElementById('ld').innerHTML='שגיאה:<br>'+e.message;}
-    },50);
-  }).catch(function(e){document.getElementById('ld').innerHTML='שגיאת טעינה:<br>'+e.message;});
-},100);
+fetch('app.js').then(function(r){return r.text();}).then(function(raw){
+  document.getElementById('ld').textContent='מתרגם...';
+  var lines=raw.split('\n'),out=[],skip=false;
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i];
+    if(/^import[\s\S]*/.test(l)&&(l.indexOf('from "react"')>-1||l.indexOf("from 'react'")>-1)){continue;}
+    if(/^import\s*\{/.test(l)||/^import\s+\{/.test(l)){skip=true;}
+    if(skip){if(l.indexOf('from ')>-1){skip=false;}continue;}
+    if(/^export\s+default\s+/.test(l)){l=l.replace(/^export\s+default\s+/,'');}
+    out.push(l);
+  }
+  var code=out.join('\n');
+  code+='ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));';
+  try{
+    var compiled=Babel.transform(code,{presets:['react']}).code;
+    (0,eval)(compiled);
+  }catch(e){document.getElementById('ld').innerHTML='שגיאה:<br>'+e.message+'<br>'+e.stack.slice(0,200);}
+}).catch(function(e){document.getElementById('ld').innerHTML='שגיאת טעינה: '+e.message;});
 </script>
 </body>
 </html>
