@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ניהול מפעל ומסגריה</title>
+<title>ניהול מפעל</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -18,24 +18,16 @@ const {useState,useEffect,useRef,useMemo}=React;
 function _no(){return null;}
 ['LayoutGrid','Package','ClipboardList','Plus','Search','AlertTriangle','Download','Send','Trash2','X','Globe','LogOut','Edit2','ArrowRightLeft','Undo2','MessageSquare','Paperclip','ChevronLeft','RefreshCw','Check','Factory','Wrench','Loader2','Layers','ListChecks','Award','SlidersHorizontal','UserCircle','Link2','ShieldCheck','Bell','Warehouse','Image'].forEach(function(n){window[n]=(lucide&&lucide[n])||_no;});
 window.ImageIcon=window.Image||_no;
-window.onerror=function(m,s,l){document.getElementById('ld').innerHTML='שגיאה שורה '+l+':<br>'+m;};
+window.onerror=function(m,s,l){document.getElementById('ld').innerHTML='שגיאה שורה '+l+': '+m;};
 fetch('app.js').then(function(r){return r.text();}).then(function(raw){
   document.getElementById('ld').textContent='מתרגם...';
-  var lines=raw.split('\n'),out=[],skip=false;
-  for(var i=0;i<lines.length;i++){
-    var l=lines[i];
-    if(/^import[\s\S]*/.test(l)&&(l.indexOf('from "react"')>-1||l.indexOf("from 'react'")>-1)){continue;}
-    if(/^import\s*\{/.test(l)||/^import\s+\{/.test(l)){skip=true;}
-    if(skip){if(l.indexOf('from ')>-1){skip=false;}continue;}
-    if(/^export\s+default\s+/.test(l)){l=l.replace(/^export\s+default\s+/,'');}
-    out.push(l);
-  }
-  var code=out.join('\n');
+  var cut=raw.indexOf('} from "lucide-react"');
+  if(cut<0)cut=raw.indexOf("} from 'lucide-react'");
+  var code=cut>=0?raw.slice(raw.indexOf('\n',cut)+1):raw;
+  code=code.replace(/^import .+$/gm,'').replace(/^export default /gm,'');
   code+='ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));';
-  try{
-    var compiled=Babel.transform(code,{presets:['react']}).code;
-    (0,eval)(compiled);
-  }catch(e){document.getElementById('ld').innerHTML='שגיאה:<br>'+e.message+'<br>'+e.stack.slice(0,200);}
+  try{(0,eval)(Babel.transform(code,{presets:['react']}).code);}
+  catch(e){document.getElementById('ld').innerHTML='שגיאה: '+e.message;}
 }).catch(function(e){document.getElementById('ld').innerHTML='שגיאת טעינה: '+e.message;});
 </script>
 </body>
