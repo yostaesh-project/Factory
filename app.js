@@ -1,11 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import {
-  LayoutGrid, Package, ClipboardList, Plus, Search, AlertTriangle,
-  Download, Image as ImageIcon, Send, Trash2, X, Globe, LogOut,
-  Edit2, ArrowRightLeft, Undo2, MessageSquare, Paperclip, ChevronLeft,
-  RefreshCw, Check, Factory, Wrench, Loader2, Layers, ListChecks, Award, SlidersHorizontal,
-  UserCircle, Link2, ShieldCheck, Bell, Warehouse
-} from "lucide-react";
+
 
 
 const STR = {
